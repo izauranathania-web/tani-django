@@ -3,7 +3,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-tani-ganti-di-production'
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['web-production-3f027.up.railway.app', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
@@ -72,4 +72,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-CSRF_TRUSTED_ORIGINS = ['https://web-production-3f027.up.railway.app']
+CSRF_TRUSTED_ORIGINS = [
+    'https://web-production-3f027.up.railway.app',
+    'https://*.up.railway.app'
+]

@@ -1,1 +1,1 @@
-web: python manage.py migrate --noinput && gunicorn tani_project.wsgi
+web: gunicorn tani_project.wsgi

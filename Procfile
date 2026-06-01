@@ -1,1 +1,1 @@
-web: gunicorn tani_project.wsgi
+web: python manage.py migrate && gunicorn tani_project.wsgi

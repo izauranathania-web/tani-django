@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Tambah Pengeluaran{% endblock %}
+{% block topbar_title %}📤 Tambah Pengeluaran{% endblock %}
+{% block nav_pengeluaran %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Tambah Pengeluaran</h1></div>
+  <a href="/laporan/pengeluaran/" class="btn btn-secondary">← Kembali</a>
+</div>
+<div class="card" style="max-width:480px">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tanggal *</label>
+        <input type="date" name="tanggal" value="{% now 'Y-m-d' %}" required>
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <select name="kategori">
+          <option value="operasional">Operasional</option>
+          <option value="peralatan">Peralatan</option>
+          <option value="transport">Transport</option>
+          <option value="lainnya">Lainnya</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Deskripsi *</label>
+      <input type="text" name="deskripsi" placeholder="contoh: Beli solar untuk traktor" required>
+    </div>
+    <div class="form-group">
+      <label>Jumlah (Rp) *</label>
+      <input type="number" name="jumlah" min="1" placeholder="0" required>
+    </div>
+    <div class="form-group">
+      <label>Keterangan</label>
+      <textarea name="keterangan" placeholder="opsional"></textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Simpan</button>
+      <a href="/laporan/pengeluaran/" class="btn btn-secondary">Batal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

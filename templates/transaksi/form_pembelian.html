@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Catat Pembelian{% endblock %}
+{% block topbar_title %}🛒 Catat Pembelian Baru{% endblock %}
+{% block nav_beli %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Catat Pembelian</h1></div>
+  <a href="/transaksi/pembelian/" class="btn btn-secondary">← Kembali</a>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="card mb-4">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tanggal *</label>
+        <input type="date" name="tanggal" value="{% now 'Y-m-d' %}" required>
+      </div>
+      <div class="form-group">
+        <label>No. Faktur *</label>
+        <input type="text" name="no_faktur" value="{{ auto_faktur }}" required>
+      </div>
+      <div class="form-group">
+        <label>Supplier</label>
+        <input type="text" name="supplier" placeholder="Nama toko / supplier">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Keterangan</label>
+      <input type="text" name="keterangan" placeholder="Catatan tambahan">
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="font-size:15px;font-weight:700">Item Pembelian</h2>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="tambahBaris()">+ Tambah Baris</button>
+    </div>
+    <table class="item-table" id="tblItem">
+      <thead>
+        <tr>
+          <th style="width:30%">Pilih Stok</th>
+          <th style="width:20%">Nama Item</th>
+          <th style="width:10%">Jumlah</th>
+          <th style="width:12%">Satuan</th>
+          <th style="width:18%">Harga/Sat (Rp)</th>
+          <th style="width:10%">Subtotal</th>
+          <th style="width:5%"></th>
+        </tr>
+      </thead>
+      <tbody id="itemBody">
+        <tr class="item-row">
+          <td>
+            <select name="stok_id" class="stok-sel" onchange="isiDariStok(this)">
+              <option value="">-- Stok --</option>
+              {% for s in stok_list %}
+              <option value="{{ s.pk }}" data-nama="{{ s.nama }}" data-satuan="{{ s.satuan }}" data-harga="{{ s.harga_beli }}">{{ s.nama }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td><input type="text" name="nama_item" placeholder="Nama item" required></td>
+          <td><input type="number" name="jumlah" step="0.1" min="0" value="1" class="jml" oninput="hitungSubtotal(this)"></td>
+          <td><input type="text" name="satuan" placeholder="kg"></td>
+          <td><input type="number" name="harga_sat" min="0" value="0" class="hsat" oninput="hitungSubtotal(this)"></td>
+          <td class="subtotal td-right" style="font-family:monospace;font-size:12px;color:#1a6b4a">0</td>
+          <td><button type="button" class="btn-remove-row" onclick="hapusBaris(this)">✕</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="text-align:right;margin-top:12px;font-size:15px;font-weight:700;color:#0f1117">
+      Total: Rp <span id="grandTotal">0</span>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Simpan Pembelian</button>
+      <a href="/transaksi/pembelian/" class="btn btn-secondary">Batal</a>
+    </div>
+  </div>
+</form>
+
+<script>
+const stokOpts = `{% for s in stok_list %}<option value="{{ s.pk }}" data-nama="{{ s.nama }}" data-satuan="{{ s.satuan }}" data-harga="{{ s.harga_beli }}">{{ s.nama }}</option>{% endfor %}`;
+
+function tambahBaris() {
+  const tbody = document.getElementById('itemBody');
+  const tr = document.createElement('tr');
+  tr.className = 'item-row';
+  tr.innerHTML = `
+    <td><select name="stok_id" class="stok-sel" onchange="isiDariStok(this)"><option value="">-- Stok --</option>${stokOpts}</select></td>
+    <td><input type="text" name="nama_item" placeholder="Nama item" required></td>
+    <td><input type="number" name="jumlah" step="0.1" min="0" value="1" class="jml" oninput="hitungSubtotal(this)"></td>
+    <td><input type="text" name="satuan" placeholder="kg"></td>
+    <td><input type="number" name="harga_sat" min="0" value="0" class="hsat" oninput="hitungSubtotal(this)"></td>
+    <td class="subtotal td-right" style="font-family:monospace;font-size:12px;color:#1a6b4a">0</td>
+    <td><button type="button" class="btn-remove-row" onclick="hapusBaris(this)">✕</button></td>`;
+  tbody.appendChild(tr);
+}
+
+function isiDariStok(sel) {
+  const opt = sel.options[sel.selectedIndex];
+  const row = sel.closest('tr');
+  if (opt.value) {
+    row.querySelector('[name=nama_item]').value = opt.dataset.nama;
+    row.querySelector('[name=satuan]').value = opt.dataset.satuan;
+    row.querySelector('[name=harga_sat]').value = opt.dataset.harga;
+    hitungSubtotal(row.querySelector('.jml'));
+  }
+}
+
+function hitungSubtotal(inp) {
+  const row = inp.closest('tr');
+  const jml  = parseFloat(row.querySelector('.jml').value) || 0;
+  const hsat = parseFloat(row.querySelector('.hsat').value) || 0;
+  row.querySelector('.subtotal').textContent = (jml * hsat).toLocaleString('id-ID');
+  hitungGrand();
+}
+
+function hitungGrand() {
+  let total = 0;
+  document.querySelectorAll('.item-row').forEach(row => {
+    const jml  = parseFloat(row.querySelector('.jml').value) || 0;
+    const hsat = parseFloat(row.querySelector('.hsat').value) || 0;
+    total += jml * hsat;
+  });
+  document.getElementById('grandTotal').textContent = total.toLocaleString('id-ID');
+}
+
+function hapusBaris(btn) {
+  const rows = document.querySelectorAll('.item-row');
+  if (rows.length > 1) { btn.closest('tr').remove(); hitungGrand(); }
+}
+</script>
+{% endblock %}

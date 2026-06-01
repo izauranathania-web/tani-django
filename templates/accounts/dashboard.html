@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block topbar_title %}📊 Dashboard{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Selamat datang, {{ request.user.username }} 👋</h1>
+    <p>Ringkasan bulan ini — {{ bulan_ini }}</p>
+  </div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stat-grid">
+  <div class="stat-card green">
+    <div class="label">Total Penjualan</div>
+    <div class="value" style="font-size:17px">Rp {{ total_penjualan|floatformat:0 }}</div>
+    <div class="sub">Bulan {{ bulan_ini }}</div>
+  </div>
+  <div class="stat-card red">
+    <div class="label">Total Pembelian</div>
+    <div class="value" style="font-size:17px">Rp {{ total_pembelian|floatformat:0 }}</div>
+    <div class="sub">Bulan {{ bulan_ini }}</div>
+  </div>
+  <div class="stat-card gold">
+    <div class="label">Total Gaji</div>
+    <div class="value" style="font-size:17px">Rp {{ total_gaji|floatformat:0 }}</div>
+    <div class="sub">Bulan {{ bulan_ini }}</div>
+  </div>
+  <div class="stat-card {% if laba_bersih >= 0 %}green{% else %}red{% endif %}">
+    <div class="label">Estimasi Laba Bersih</div>
+    <div class="value" style="font-size:17px">Rp {{ laba_bersih|floatformat:0 }}</div>
+    <div class="sub">{% if laba_bersih >= 0 %}✅ Untung{% else %}❌ Rugi{% endif %} bulan ini</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="label">Stok Bibit</div>
+    <div class="value">{{ stok_bibit }}</div>
+    <div class="sub">jenis bibit terdaftar</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="label">Stok Pupuk</div>
+    <div class="value">{{ stok_pupuk }}</div>
+    <div class="sub">jenis pupuk terdaftar</div>
+  </div>
+  <div class="stat-card {% if stok_menipis > 0 %}red{% else %}green{% endif %}">
+    <div class="label">Stok Menipis</div>
+    <div class="value">{{ stok_menipis }}</div>
+    <div class="sub">item stok ≤ 10</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Pegawai Aktif</div>
+    <div class="value">{{ pegawai_aktif }}</div>
+    <div class="sub">orang</div>
+  </div>
+</div>
+
+<!-- TRANSAKSI TERBARU -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;flex-wrap:wrap">
+  <div>
+    <div class="page-header" style="margin-bottom:10px">
+      <h1 style="font-size:15px">🛒 Pembelian Terbaru</h1>
+      <a href="/transaksi/pembelian/" class="btn btn-secondary btn-sm">Lihat Semua</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tanggal</th><th>No. Faktur</th><th>Total</th></tr></thead>
+        <tbody>
+          {% for pb in pembelian_terbaru %}
+          <tr>
+            <td>{{ pb.tanggal }}</td>
+            <td><span style="color:#1a6b4a;font-weight:600;font-family:monospace">{{ pb.no_faktur }}</span></td>
+            <td class="td-right">Rp {{ pb.total|floatformat:0 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="td-center text-muted">Belum ada pembelian</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <div class="page-header" style="margin-bottom:10px">
+      <h1 style="font-size:15px">💰 Penjualan Terbaru</h1>
+      <a href="/transaksi/penjualan/" class="btn btn-secondary btn-sm">Lihat Semua</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tanggal</th><th>No. Faktur</th><th>Total</th></tr></thead>
+        <tbody>
+          {% for pj in penjualan_terbaru %}
+          <tr>
+            <td>{{ pj.tanggal }}</td>
+            <td><span style="color:#1a6b4a;font-weight:600;font-family:monospace">{{ pj.no_faktur }}</span></td>
+            <td class="td-right">Rp {{ pj.total|floatformat:0 }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="td-center text-muted">Belum ada penjualan</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK LINKS -->
+<div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+  <a href="/stok/tambah/" class="btn btn-secondary">🌿 Tambah Stok</a>
+  <a href="/transaksi/pembelian/tambah/" class="btn btn-secondary">🛒 Catat Pembelian</a>
+  <a href="/transaksi/penjualan/tambah/" class="btn btn-primary">💰 Catat Penjualan</a>
+  <a href="/laporan/laba-rugi/" class="btn btn-secondary">📈 Lihat Laporan</a>
+</div>
+{% endblock %}

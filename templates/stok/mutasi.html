@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Mutasi Stok{% endblock %}
+{% block topbar_title %}📦 Mutasi Stok — {{ stok.nama }}{% endblock %}
+{% block nav_stok %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Mutasi Stok: {{ stok.nama }}</h1>
+    <p>Stok saat ini: <strong>{{ stok.stok|floatformat:1 }} {{ stok.satuan }}</strong></p>
+  </div>
+  <a href="/stok/" class="btn btn-secondary">← Kembali</a>
+</div>
+
+<div style="display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start;flex-wrap:wrap">
+  <!-- FORM MUTASI -->
+  <div class="card">
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:16px">Catat Mutasi</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Jenis Mutasi *</label>
+        <select name="jenis" required>
+          <option value="masuk">📥 Masuk (Stok Bertambah)</option>
+          <option value="keluar">📤 Keluar (Stok Berkurang)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Jumlah *</label>
+        <input type="number" name="jumlah" step="0.1" min="0.1" placeholder="0" required>
+      </div>
+      <div class="form-group">
+        <label>Harga per {{ stok.satuan }} (Rp)</label>
+        <input type="number" name="harga_sat" value="{{ stok.harga_beli }}" min="0">
+      </div>
+      <div class="form-group">
+        <label>Tanggal</label>
+        <input type="date" name="tanggal" value="{% now 'Y-m-d' %}">
+      </div>
+      <div class="form-group">
+        <label>Keterangan</label>
+        <input type="text" name="keterangan" placeholder="contoh: Pembelian dari Toko ABC">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">💾 Catat</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- RIWAYAT MUTASI -->
+  <div>
+    <h2 style="font-size:15px;font-weight:700;margin-bottom:10px">Riwayat Mutasi (20 Terakhir)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Tanggal</th><th>Jenis</th><th class="td-right">Jumlah</th><th class="td-right">Harga/Sat</th><th>Keterangan</th></tr>
+        </thead>
+        <tbody>
+          {% for m in riwayat %}
+          <tr>
+            <td>{{ m.tanggal }}</td>
+            <td><span class="badge badge-{{ m.jenis }}">{{ m.jenis|capfirst }}</span></td>
+            <td class="td-right">{{ m.jumlah|floatformat:1 }}</td>
+            <td class="td-right">Rp {{ m.harga_sat|floatformat:0 }}</td>
+            <td class="text-muted">{{ m.keterangan|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="td-center text-muted">Belum ada riwayat</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ judul }}{% endblock %}
+{% block topbar_title %}👨‍🌾 {{ judul }}{% endblock %}
+{% block nav_pegawai %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>{{ judul }}</h1></div>
+  <a href="/pegawai/" class="btn btn-secondary">← Kembali</a>
+</div>
+<div class="card" style="max-width:560px">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nama Lengkap *</label>
+        <input type="text" name="nama" value="{{ pegawai.nama|default:'' }}" required>
+      </div>
+      <div class="form-group">
+        <label>Jabatan</label>
+        <input type="text" name="jabatan" value="{{ pegawai.jabatan|default:'' }}" placeholder="contoh: Buruh Tani, Mandor">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>No. HP</label>
+        <input type="text" name="no_hp" value="{{ pegawai.no_hp|default:'' }}">
+      </div>
+      <div class="form-group">
+        <label>Gaji Pokok (Rp)</label>
+        <input type="number" name="gaji_pokok" value="{{ pegawai.gaji_pokok|default:0 }}" min="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tanggal Masuk</label>
+        <input type="date" name="tanggal_masuk" value="{{ pegawai.tanggal_masuk|default:'' }}">
+      </div>
+      {% if pegawai %}
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="aktif" {% if pegawai.status == 'aktif' %}selected{% endif %}>Aktif</option>
+          <option value="nonaktif" {% if pegawai.status == 'nonaktif' %}selected{% endif %}>Nonaktif</option>
+        </select>
+      </div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      <label>Alamat</label>
+      <textarea name="alamat">{{ pegawai.alamat|default:'' }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Simpan</button>
+      <a href="/pegawai/" class="btn btn-secondary">Batal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

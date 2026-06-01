@@ -1,0 +1,1 @@
+web: gunicorn tani_project.wsgi

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Pengeluaran{% endblock %}
+{% block topbar_title %}📤 Pengeluaran Operasional{% endblock %}
+{% block nav_pengeluaran %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Pengeluaran Operasional</h1><p>Biaya di luar pembelian stok dan gaji</p></div>
+  <a href="/laporan/pengeluaran/tambah/" class="btn btn-primary">+ Tambah Pengeluaran</a>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Tanggal</th><th>Kategori</th><th>Deskripsi</th><th class="td-right">Jumlah</th><th>Keterangan</th><th class="td-center">Aksi</th></tr></thead>
+    <tbody>
+      {% for pe in list %}
+      <tr>
+        <td>{{ pe.tanggal }}</td>
+        <td><span class="badge badge-lainnya">{{ pe.get_kategori_display }}</span></td>
+        <td><strong>{{ pe.deskripsi }}</strong></td>
+        <td class="td-right">Rp {{ pe.jumlah|floatformat:0 }}</td>
+        <td class="text-muted">{{ pe.keterangan|default:"-" }}</td>
+        <td class="td-center">
+          <form method="post" action="/laporan/pengeluaran/{{ pe.pk }}/hapus/" style="display:inline" onsubmit="return confirm('Hapus pengeluaran ini?')">
+            {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="td-center text-muted" style="padding:24px">Belum ada pengeluaran.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

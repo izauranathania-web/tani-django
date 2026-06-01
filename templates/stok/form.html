@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ judul }}{% endblock %}
+{% block topbar_title %}🌿 {{ judul }}{% endblock %}
+{% block nav_stok %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>{{ judul }}</h1></div>
+  <a href="/stok/" class="btn btn-secondary">← Kembali</a>
+</div>
+<div class="card" style="max-width:540px">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label>Nama Item *</label>
+        <input type="text" name="nama" value="{{ stok.nama|default:'' }}" placeholder="contoh: Bibit Padi IR64" required>
+      </div>
+      <div class="form-group">
+        <label>Kategori *</label>
+        <select name="kategori" required>
+          <option value="">-- Pilih --</option>
+          <option value="bibit" {% if stok.kategori == 'bibit' %}selected{% endif %}>Bibit</option>
+          <option value="pupuk" {% if stok.kategori == 'pupuk' %}selected{% endif %}>Pupuk</option>
+          <option value="lainnya" {% if stok.kategori == 'lainnya' %}selected{% endif %}>Lainnya</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Satuan *</label>
+        <input type="text" name="satuan" value="{{ stok.satuan|default:'' }}" placeholder="kg / liter / batang / karung" required>
+      </div>
+      <div class="form-group">
+        <label>Harga Beli per Satuan (Rp)</label>
+        <input type="number" name="harga_beli" value="{{ stok.harga_beli|default:0 }}" min="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Keterangan</label>
+      <textarea name="keterangan">{{ stok.keterangan|default:'' }}</textarea>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">💾 Simpan</button>
+      <a href="/stok/" class="btn btn-secondary">Batal</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

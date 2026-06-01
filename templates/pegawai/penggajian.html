@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Penggajian{% endblock %}
+{% block topbar_title %}💵 Penggajian{% endblock %}
+{% block nav_gaji %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Penggajian</h1><p>Catat pembayaran gaji pegawai per periode</p></div>
+</div>
+
+<form class="filter-bar" method="get">
+  <div class="form-group">
+    <label>Periode (Bulan)</label>
+    <input type="month" name="periode" value="{{ periode }}">
+  </div>
+  <button type="submit" class="btn btn-secondary">Tampilkan</button>
+</form>
+
+<div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
+  <!-- TABEL GAJI SUDAH DIBAYAR -->
+  <div>
+    <h2 style="font-size:14px;font-weight:700;margin-bottom:10px">Gaji Dibayar — Periode {{ periode }}</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nama</th><th>Jabatan</th><th class="td-right">Gaji Pokok</th><th class="td-right">Tunjangan</th><th class="td-right">Potongan</th><th class="td-right">Total</th><th>Tgl Bayar</th></tr></thead>
+        <tbody>
+          {% for g in list_gaji %}
+          <tr>
+            <td><strong>{{ g.pegawai.nama }}</strong></td>
+            <td class="text-muted">{{ g.pegawai.jabatan|default:"-" }}</td>
+            <td class="td-right">Rp {{ g.gaji_pokok|floatformat:0 }}</td>
+            <td class="td-right text-green">+ {{ g.tunjangan|floatformat:0 }}</td>
+            <td class="td-right text-red">- {{ g.potongan|floatformat:0 }}</td>
+            <td class="td-right"><strong>Rp {{ g.total_gaji|floatformat:0 }}</strong></td>
+            <td>{{ g.tanggal_bayar }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="td-center text-muted" style="padding:18px">Belum ada penggajian untuk periode ini.</td></tr>
+          {% endfor %}
+        </tbody>
+        {% if list_gaji %}
+        <tfoot>
+          <tr style="background:#f0fdf4">
+            <td colspan="5"><strong>Total Pengeluaran Gaji</strong></td>
+            <td class="td-right"><strong>Rp {% for g in list_gaji %}{{ g.total_gaji }}{% endfor %}</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+    </div>
+
+    <!-- Pegawai belum dibayar -->
+    {% with sudah_ids=list_gaji|length %}
+    {% if pegawai_aktif %}
+    <div class="mt-4">
+      <h2 style="font-size:13px;font-weight:700;color:#6b7280;margin-bottom:8px">Belum Digaji Periode Ini:</h2>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        {% for p in pegawai_aktif %}
+          {% if not list_gaji or p not in list_gaji|dictsort:"pegawai_id" %}
+          <span style="background:#fef3c7;border:1px solid #fcd34d;padding:3px 10px;border-radius:100px;font-size:12px;color:#78350f">{{ p.nama }}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- FORM BAYAR GAJI -->
+  <div class="card">
+    <h2 style="font-size:14px;font-weight:700;margin-bottom:14px">💵 Catat Pembayaran Gaji</h2>
+    <form method="post" action="/pegawai/penggajian/bayar/">
+      {% csrf_token %}
+      <input type="hidden" name="periode" value="{{ periode }}">
+      <div class="form-group">
+        <label>Pegawai *</label>
+        <select name="pegawai_id" required>
+          <option value="">-- Pilih Pegawai --</option>
+          {% for p in pegawai_aktif %}
+          <option value="{{ p.pk }}">{{ p.nama }} — Rp {{ p.gaji_pokok|floatformat:0 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tunjangan (Rp)</label>
+        <input type="number" name="tunjangan" value="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Potongan (Rp)</label>
+        <input type="number" name="potongan" value="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Tanggal Bayar</label>
+        <input type="date" name="tanggal_bayar" value="{% now 'Y-m-d' %}">
+      </div>
+      <div class="form-group">
+        <label>Keterangan</label>
+        <input type="text" name="keterangan" placeholder="opsional">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">💾 Catat Pembayaran</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Penjualan{% endblock %}
+{% block topbar_title %}💰 Daftar Penjualan{% endblock %}
+{% block nav_jual %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Penjualan</h1><p>Catat penjualan hasil pertanian</p></div>
+  <a href="/transaksi/penjualan/tambah/" class="btn btn-primary">+ Catat Penjualan</a>
+</div>
+
+<form class="filter-bar" method="get">
+  <div class="form-group"><label>Dari Tanggal</label><input type="date" name="start" value="{{ request.GET.start }}"></div>
+  <div class="form-group"><label>Sampai Tanggal</label><input type="date" name="end" value="{{ request.GET.end }}"></div>
+  <button type="submit" class="btn btn-secondary">Filter</button>
+  <a href="/transaksi/penjualan/" class="btn btn-secondary">Reset</a>
+</form>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Tanggal</th><th>No. Faktur</th><th>Pembeli</th><th>Item</th><th class="td-right">Total</th><th class="td-center">Aksi</th></tr></thead>
+    <tbody>
+      {% for pj in list %}
+      <tr>
+        <td>{{ pj.tanggal }}</td>
+        <td><span style="color:#1a6b4a;font-weight:600;font-family:monospace">{{ pj.no_faktur }}</span></td>
+        <td>{{ pj.pembeli|default:"-" }}</td>
+        <td class="text-muted">{% for item in pj.items.all %}{{ item.nama_item }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+        <td class="td-right"><strong>Rp {{ pj.total|floatformat:0 }}</strong></td>
+        <td class="td-center">
+          <form method="post" action="/transaksi/penjualan/{{ pj.pk }}/hapus/" style="display:inline" onsubmit="return confirm('Hapus penjualan {{ pj.no_faktur }}?')">
+            {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm">🗑️ Hapus</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="td-center text-muted" style="padding:24px">Belum ada penjualan.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

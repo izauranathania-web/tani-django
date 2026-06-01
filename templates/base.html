@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}TaniApp{% endblock %} — Sistem Manajemen Pertanian</title>
+<style>
+:root {
+  --green:   #1a6b4a;
+  --green2:  #22c87a;
+  --green3:  #f0fdf4;
+  --ink:     #0f1117;
+  --ink2:    #2d3142;
+  --ink3:    #5c6070;
+  --paper:   #faf9f6;
+  --paper2:  #f2f0eb;
+  --rule:    #dedad2;
+  --red:     #dc2626;
+  --blue:    #1d4ed8;
+  --gold:    #b45309;
+  --sidebar: 220px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:15px}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--paper);color:var(--ink);display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--ink);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+.sidebar-brand{padding:20px 18px 16px;border-bottom:1px solid #ffffff18}
+.sidebar-brand .logo{font-size:22px;font-weight:700;letter-spacing:-.5px;color:#fff}
+.sidebar-brand .logo span{color:var(--green2)}
+.sidebar-brand .tagline{font-size:10px;color:#9ca3af;letter-spacing:1px;margin-top:2px}
+.nav{padding:12px 0;flex:1}
+.nav-section{padding:8px 18px 4px;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#6b7280}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 18px;color:#d1d5db;text-decoration:none;font-size:13px;font-weight:500;transition:background .15s}
+.nav a:hover{background:#ffffff12;color:#fff}
+.nav a.active{background:var(--green);color:#fff}
+.nav a .ico{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:14px 18px;border-top:1px solid #ffffff18;font-size:11px;color:#6b7280}
+.sidebar-footer strong{color:#d1d5db}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--rule);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:16px;font-weight:700;color:var(--ink)}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.user-badge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink3)}
+.user-badge strong{color:var(--ink2)}
+.btn-logout{font-size:11px;background:var(--paper2);border:1px solid var(--rule);border-radius:4px;padding:5px 12px;color:var(--ink2);text-decoration:none;font-weight:500}
+.btn-logout:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.content{padding:28px;flex:1}
+
+/* CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:16px 18px}
+.stat-card .label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.stat-card .value{font-size:22px;font-weight:700;color:var(--ink);line-height:1}
+.stat-card .sub{font-size:11px;color:var(--ink3);margin-top:4px}
+.stat-card.green{border-left:3px solid var(--green2)}
+.stat-card.red{border-left:3px solid var(--red)}
+.stat-card.blue{border-left:3px solid var(--blue)}
+.stat-card.gold{border-left:3px solid var(--gold)}
+
+/* PAGE HEADER */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.page-header h1{font-size:20px;font-weight:700;color:var(--ink)}
+.page-header p{font-size:12px;color:var(--ink3);margin-top:2px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:5px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:filter .15s}
+.btn:hover{filter:brightness(.92)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-danger{background:var(--red);color:#fff}
+.btn-secondary{background:var(--paper2);color:var(--ink2);border:1px solid var(--rule)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-warning{background:#f59e0b;color:#fff}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;background:#fff;border:1px solid var(--rule);border-radius:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--ink);color:#fff;padding:10px 14px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+tbody tr:nth-child(even){background:var(--paper)}
+tbody td{padding:9px 14px;border-bottom:1px solid var(--rule);vertical-align:middle;color:var(--ink2)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#f0fdf4}
+.td-right{text-align:right;font-family:monospace}
+.td-center{text-align:center}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600}
+.badge-bibit{background:#dbeafe;color:#1e3a8a}
+.badge-pupuk{background:#d1fae5;color:#065f46}
+.badge-lainnya{background:#fef3c7;color:#78350f}
+.badge-aktif{background:#d1fae5;color:#065f46}
+.badge-nonaktif{background:#fee2e2;color:#7f1d1d}
+.badge-masuk{background:#d1fae5;color:#065f46}
+.badge-keluar{background:#fee2e2;color:#7f1d1d}
+
+/* FORM */
+.card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:24px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:5px;letter-spacing:.3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid var(--rule);border-radius:5px;font-size:13px;color:var(--ink);background:#fff;outline:none;transition:border .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--green)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.form-actions{display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--rule)}
+
+/* FILTER BAR */
+.filter-bar{background:#fff;border:1px solid var(--rule);border-radius:7px;padding:14px 16px;margin-bottom:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.filter-bar .form-group{margin-bottom:0;min-width:140px}
+.filter-bar .form-group label{font-size:10px}
+
+/* ALERT */
+.alert{padding:11px 15px;border-radius:5px;font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.alert-success{background:#f0fdf4;border:1px solid #86efac;color:#166534}
+.alert-error{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+.alert-warning{background:#fffbeb;border:1px solid #fcd34d;color:#78350f}
+
+/* LABA RUGI */
+.lr-section{margin-bottom:20px}
+.lr-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--rule);font-size:14px}
+.lr-row.total{font-weight:700;font-size:15px;border-top:2px solid var(--ink);border-bottom:none;padding-top:10px}
+.lr-row.laba{color:var(--green);font-weight:700;font-size:16px}
+.lr-row.rugi{color:var(--red);font-weight:700;font-size:16px}
+.lr-label{color:var(--ink2)}
+.lr-value{font-family:monospace;color:var(--ink)}
+.lr-indent{padding-left:20px;color:var(--ink3)}
+
+/* ITEM ROWS (dynamic) */
+.item-table{width:100%;border-collapse:collapse;margin-top:10px}
+.item-table th{font-size:11px;font-weight:600;color:var(--ink3);padding:6px 8px;text-align:left;border-bottom:1px solid var(--rule)}
+.item-table td{padding:6px 8px;vertical-align:middle}
+.item-table input,.item-table select{padding:6px 8px;border:1px solid var(--rule);border-radius:4px;font-size:12px;width:100%}
+.btn-remove-row{background:var(--red);color:#fff;border:none;border-radius:3px;padding:4px 8px;cursor:pointer;font-size:11px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+  .stat-grid{grid-template-columns:1fr 1fr}
+}
+
+.rp::before{content:'Rp '}
+.text-green{color:var(--green)}
+.text-red{color:var(--red)}
+.text-muted{color:var(--ink3);font-size:12px}
+.mt-4{margin-top:16px}
+.mb-4{margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">🌱 Tani<span>App</span></div>
+    <div class="tagline">Sistem Manajemen Pertanian</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Utama</div>
+    <a href="/" class="{% block nav_dashboard %}{% endblock %}"><span class="ico">📊</span> Dashboard</a>
+
+    <div class="nav-section">Inventaris</div>
+    <a href="/stok/" class="{% block nav_stok %}{% endblock %}"><span class="ico">🌿</span> Stok Bibit & Pupuk</a>
+
+    <div class="nav-section">Transaksi</div>
+    <a href="/transaksi/pembelian/" class="{% block nav_beli %}{% endblock %}"><span class="ico">🛒</span> Pembelian</a>
+    <a href="/transaksi/penjualan/" class="{% block nav_jual %}{% endblock %}"><span class="ico">💰</span> Penjualan</a>
+
+    <div class="nav-section">SDM</div>
+    <a href="/pegawai/" class="{% block nav_pegawai %}{% endblock %}"><span class="ico">👨‍🌾</span> Pegawai</a>
+    <a href="/pegawai/penggajian/" class="{% block nav_gaji %}{% endblock %}"><span class="ico">💵</span> Penggajian</a>
+
+    <div class="nav-section">Keuangan</div>
+    <a href="/laporan/pengeluaran/" class="{% block nav_pengeluaran %}{% endblock %}"><span class="ico">📤</span> Pengeluaran</a>
+    <a href="/laporan/laba-rugi/" class="{% block nav_laporan %}{% endblock %}"><span class="ico">📈</span> Laporan Laba/Rugi</a>
+  </nav>
+  <div class="sidebar-footer">
+    Login sebagai<br><strong>{{ request.user.username }}</strong>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">{% block topbar_title %}{% endblock %}</div>
+    <div class="topbar-right">
+      <div class="user-badge">👤 <strong>{{ request.user.username }}</strong></div>
+      <a href="/logout/" class="btn-logout">Keluar</a>
+    </div>
+  </div>
+
+  <div class="content">
+    {% if messages %}
+      {% for msg in messages %}
+        <div class="alert alert-{% if msg.tags == 'error' %}error{% elif msg.tags == 'warning' %}warning{% else %}success{% endif %}">
+          {% if msg.tags == 'error' %}⚠️{% elif msg.tags == 'warning' %}⚡{% else %}✅{% endif %}
+          {{ msg }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+</body>
+</html>

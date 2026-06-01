@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Stok{% endblock %}
+{% block topbar_title %}🌿 Stok Bibit & Pupuk{% endblock %}
+{% block nav_stok %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Stok Bibit & Pupuk</h1><p>Kelola inventaris bibit dan pupuk</p></div>
+  <a href="/stok/tambah/" class="btn btn-primary">+ Tambah Item</a>
+</div>
+
+<div class="filter-bar">
+  <div class="form-group">
+    <label>Filter Kategori</label>
+    <select onchange="location.href='?kategori='+this.value">
+      <option value="" {% if not kategori %}selected{% endif %}>Semua</option>
+      <option value="bibit" {% if kategori == 'bibit' %}selected{% endif %}>Bibit</option>
+      <option value="pupuk" {% if kategori == 'pupuk' %}selected{% endif %}>Pupuk</option>
+      <option value="lainnya" {% if kategori == 'lainnya' %}selected{% endif %}>Lainnya</option>
+    </select>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Nama</th><th>Kategori</th><th>Satuan</th>
+        <th class="td-right">Stok</th><th class="td-right">Harga Beli/Sat</th>
+        <th>Keterangan</th><th class="td-center">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in stok_list %}
+      <tr>
+        <td><strong>{{ s.nama }}</strong></td>
+        <td><span class="badge badge-{{ s.kategori }}">{{ s.get_kategori_display }}</span></td>
+        <td>{{ s.satuan }}</td>
+        <td class="td-right {% if s.stok <= 10 %}text-red{% endif %}">
+          <strong>{{ s.stok|floatformat:1 }}</strong>
+          {% if s.stok <= 10 %}<span style="font-size:10px;color:#dc2626"> ⚠️ Menipis</span>{% endif %}
+        </td>
+        <td class="td-right">Rp {{ s.harga_beli|floatformat:0 }}</td>
+        <td class="text-muted">{{ s.keterangan|default:"-" }}</td>
+        <td class="td-center" style="white-space:nowrap">
+          <a href="/stok/{{ s.pk }}/mutasi/" class="btn btn-secondary btn-sm">📦 Mutasi</a>
+          <a href="/stok/{{ s.pk }}/edit/" class="btn btn-secondary btn-sm">✏️</a>
+          <form method="post" action="/stok/{{ s.pk }}/hapus/" style="display:inline" onsubmit="return confirm('Hapus stok {{ s.nama }}?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="td-center text-muted" style="padding:24px">Belum ada stok. <a href="/stok/tambah/" style="color:var(--green)">Tambah sekarang →</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

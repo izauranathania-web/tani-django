@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Pegawai{% endblock %}
+{% block topbar_title %}👨‍🌾 Data Pegawai{% endblock %}
+{% block nav_pegawai %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div><h1>Data Pegawai</h1><p>Kelola data pegawai pertanian</p></div>
+  <a href="/pegawai/tambah/" class="btn btn-primary">+ Tambah Pegawai</a>
+</div>
+
+<form class="filter-bar" method="get">
+  <div class="form-group">
+    <label>Status</label>
+    <select name="status" onchange="this.form.submit()">
+      <option value="">Semua</option>
+      <option value="aktif" {% if status == 'aktif' %}selected{% endif %}>Aktif</option>
+      <option value="nonaktif" {% if status == 'nonaktif' %}selected{% endif %}>Nonaktif</option>
+    </select>
+  </div>
+</form>
+
+<div class="table-wrap">
+  <table>
+    <thead><tr><th>Nama</th><th>Jabatan</th><th>No. HP</th><th class="td-right">Gaji Pokok</th><th>Status</th><th>Tgl Masuk</th><th class="td-center">Aksi</th></tr></thead>
+    <tbody>
+      {% for p in pegawai_list %}
+      <tr>
+        <td><strong>{{ p.nama }}</strong></td>
+        <td>{{ p.jabatan|default:"-" }}</td>
+        <td>{{ p.no_hp|default:"-" }}</td>
+        <td class="td-right">Rp {{ p.gaji_pokok|floatformat:0 }}</td>
+        <td><span class="badge badge-{{ p.status }}">{{ p.status|capfirst }}</span></td>
+        <td>{{ p.tanggal_masuk|default:"-" }}</td>
+        <td class="td-center" style="white-space:nowrap">
+          <a href="/pegawai/{{ p.pk }}/edit/" class="btn btn-secondary btn-sm">✏️ Edit</a>
+          <form method="post" action="/pegawai/{{ p.pk }}/hapus/" style="display:inline" onsubmit="return confirm('Hapus pegawai {{ p.nama }}?')">
+            {% csrf_token %}<button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" class="td-center text-muted" style="padding:24px">Belum ada pegawai. <a href="/pegawai/tambah/" style="color:var(--green)">Tambah →</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

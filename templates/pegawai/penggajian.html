@@ -69,7 +69,7 @@
 
   <!-- FORM BAYAR GAJI -->
   <div class="card">
-    <h2 style="font-size:14px;font-weight:700;margin-bottom:14px">💵 Catat Pembayaran Gaji</h2>
+    <h2 style="font-size:14px;font-weight:700;margin-bottom:14px"> Catat Pembayaran Gaji</h2>
     <form method="post" action="/pegawai/penggajian/bayar/">
       {% csrf_token %}
       <input type="hidden" name="periode" value="{{ periode }}">

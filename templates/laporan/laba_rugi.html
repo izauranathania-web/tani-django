@@ -20,7 +20,7 @@
   <!-- LAPORAN FORMAL -->
   <div class="card" id="laporan-print">
     <div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #0f1117">
-      <div style="font-size:18px;font-weight:700"> LAPORAN LABA / RUGI</div>
+      <div style="font-size:18px;font-weight:700">🌱 LAPORAN LABA / RUGI</div>
       <div style="font-size:12px;color:#6b7280;margin-top:4px">Periode: {{ start }} — {{ end }}</div>
     </div>
 
@@ -50,8 +50,11 @@
     <div class="lr-section" style="background:#f0fdf4;padding:12px;border-radius:6px;border:1px solid #86efac">
       <div class="lr-row" style="border:none;padding:0">
         <span style="font-weight:700;font-size:15px">Laba Kotor</span>
-        <span style="font-weight:700;font-size:15px;color:{% if laba_kotor >= 0 %}#166534{% else %}#dc2626{% endif %}">Rp {{ laba_kotor|floatformat:0 }}</span>
-      </div>
+       {% if laba_kotor >= 0 %}
+    <span style="font-weight: 700; font-size: 15px; color: #166534;">Rp {{ laba_kotor|floatformat:0 }}</span>
+{% else %}
+    <span style="font-weight: 700; font-size: 15px; color: #dc2626;">Rp {{ laba_kotor|floatformat:0 }}</span>
+{% endif %}
     </div>
 
     <!-- BEBAN -->
@@ -74,13 +77,23 @@
     </div>
 
     <!-- LABA BERSIH -->
-    <div style="margin-top:16px;padding:16px;border-radius:6px;background:{% if laba_bersih >= 0 %}#f0fdf4;border:2px solid #22c55e{% else %}#fef2f2;border:2px solid #dc2626{% endif %}">
-      <div class="lr-row" style="border:none;padding:0">
-        <span style="font-weight:700;font-size:18px">
-          {% if laba_bersih >= 0 %}✅ LABA BERSIH{% else %}❌ RUGI BERSIH{% endif %}
-        </span>
-        <span style="font-weight:700;font-size:18px;color:{% if laba_bersih >= 0 %}#166534{% else %}#dc2626{% endif %}">
-          Rp {{ laba_bersih|floatformat:0 }}
+    {% if laba_bersih >= 0 %}
+    <div style="margin-top:16px; padding:16px; border-radius:6px; background: #f0fdf4; border: 1px solid #bbf7d0;">
+        <div class="lr-row" style="border:none; padding:0">
+            <span style="font-weight:700; font-size:18px; color: #166534;">
+                LABA BERSIH
+            </span>
+        </div>
+    </div>
+{% else %}
+    <div style="margin-top:16px; padding:16px; border-radius:6px; background: #fef2f2; border: 1px solid #fecaca;">
+        <div class="lr-row" style="border:none; padding:0">
+            <span style="font-weight:700; font-size:18px; color: #dc2626;">
+                RUGI BERSIH
+            </span>
+        </div>
+    </div>
+{% endif %}
         </span>
       </div>
     </div>
